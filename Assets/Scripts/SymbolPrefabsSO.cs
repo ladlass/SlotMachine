@@ -27,3 +27,8 @@ public class SymbolPrefabData
     public GameObject prefab;
     public SlotSymbolTypes type;
 }
+
+public enum SlotSymbolTypes
+{
+    A, Seven, Bonus, Jackpot, Wild
+}

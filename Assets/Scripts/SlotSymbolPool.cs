@@ -7,17 +7,23 @@ public class SlotSymbolPool
 {
     [SerializeField]private List<SlotSymbolData> slotItemsPool;
     private Dictionary<SlotSymbolTypes, GameObject> symbolPrefabs;
-
-    public SlotSymbolPool(Dictionary<SlotSymbolTypes, GameObject> symbolPrefabs)
+    private Transform garbage;
+    public SlotSymbolPool(Dictionary<SlotSymbolTypes, GameObject> symbolPrefabs, Transform garbage)
     {
         slotItemsPool = new List<SlotSymbolData>();
         this.symbolPrefabs = symbolPrefabs;
+        this.garbage = garbage;
     }
 
     public void Add(SlotSymbolData newData)
     {
         if(slotItemsPool != null)
         {
+            if (newData.rect)
+            {
+                newData.rect.transform.SetParent(garbage);
+                newData.rect.gameObject.SetActive(false);
+            }
             slotItemsPool.Add(newData);
         }
     }
@@ -70,6 +76,10 @@ public class SlotSymbolPool
             if(slotItemsPool[i] != null && slotItemsPool[i].symbolType == type)
             {
                 symbolToReturn = slotItemsPool[i];
+                if (symbolToReturn.rect)
+                {
+                    symbolToReturn.rect.gameObject.SetActive(true);
+                }
                 slotItemsPool.RemoveAt(i);
                 break;
             }
