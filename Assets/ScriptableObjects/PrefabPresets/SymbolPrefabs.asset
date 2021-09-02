@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d72a7fe33572dd47a342de232dc1110, type: 3}
+  m_Name: SymbolPrefabs
+  m_EditorClassIdentifier: 
+  prefabs:
+  - normalImage: {fileID: 21300000, guid: 9447e57ff5d1b9d42bbba9e43e0c13b4, type: 3}
+    blurryImage: {fileID: 21300000, guid: 6c6e341f676b55d45ba331df60429b73, type: 3}
+    type: 0
+  - normalImage: {fileID: 21300000, guid: a6df315b1efee9947bcce4265603c582, type: 3}
+    blurryImage: {fileID: 21300000, guid: 8c335a2f5bcc12c48b717408566ed13f, type: 3}
+    type: 1
+  - normalImage: {fileID: 21300000, guid: 51bdd9fe90e716b42a8a36c744a7dc07, type: 3}
+    blurryImage: {fileID: 21300000, guid: 0dd9fe5bec388e94287337dd80ecbc4f, type: 3}
+    type: 2
+  - normalImage: {fileID: 21300000, guid: 9f460e9d8feedac41bb140603dda2950, type: 3}
+    blurryImage: {fileID: 21300000, guid: dacde7b8dc1a6464b83c3a84343c477c, type: 3}
+    type: 3
+  - normalImage: {fileID: 21300000, guid: 327dca54be02206478f6861a0831f08c, type: 3}
+    blurryImage: {fileID: 21300000, guid: 4fe3c3ad59b8f434a9c9fd6d70233617, type: 3}
+    type: 4
+  prefabClass: {fileID: 1865267331457405636, guid: 95582028a920e5648b7e09e237a26ca3, type: 3}

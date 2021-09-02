@@ -5703,19 +5703,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   columnData:
   - column: {fileID: 904597926}
-    spinner:
-    - {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
+    spinnersWithCondition:
+    - condition: {fileID: 0}
+      spinnerOnTrue: {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
+      spinnerOnFalse: {fileID: 0}
   - column: {fileID: 1951819588}
-    spinner:
-    - {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
+    spinnersWithCondition:
+    - condition: {fileID: 0}
+      spinnerOnTrue: {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
+      spinnerOnFalse: {fileID: 0}
   - column: {fileID: 1354845951}
-    spinner:
-    - {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
-    - {fileID: 11400000, guid: f437b04860217284aa4a4a46f4c4d451, type: 2}
+    spinnersWithCondition:
+    - condition: {fileID: 0}
+      spinnerOnTrue: {fileID: 11400000, guid: c05cbb4b193ac484e93c04596fb90542, type: 2}
+      spinnerOnFalse: {fileID: 0}
+    - condition: {fileID: 11400000, guid: 20a33d7796cec0946a56044a8f10e1d4, type: 2}
+      spinnerOnTrue: {fileID: 11400000, guid: f437b04860217284aa4a4a46f4c4d451, type: 2}
+      spinnerOnFalse: {fileID: 0}
   prefabsList: {fileID: 11400000, guid: 5c986206bb007a64a9104451479d7836, type: 2}
+  slotSequence: {fileID: 11400000, guid: 04e0d025e9d47734ea5ed69bd23ce959, type: 2}
   garbage: {fileID: 429385645}
-  eachColumnSpinStartDelayDurationMin: 0.104
-  eachColumnSpinStartDelayDurationMax: 0.145
+  eachColumnSpinStartDelayDurationMin: 0.18
+  eachColumnSpinStartDelayDurationMax: 0.21
   imageVerticalSize: 260
 --- !u!1 &1884010118
 GameObject:

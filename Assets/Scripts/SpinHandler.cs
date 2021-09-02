@@ -2,31 +2,41 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class SpinHandler
 {
-    private float lowerThresholdPos = -400;
     private List<SlotSymbolData> slotSymbols;
-    private Action<int, bool > onSymbolReachesThreshold;
-    public bool IsSpinning { get; private set; } = false;
     private SpinnerManager spinnerManager;
-    private int symbolCounterToStop = 0;
 
-    public SpinHandler(SpinnerManager spinnerManager, List<SlotSymbolData> slotSymbols, Action<int, bool> onSymbolReachesThreshold, float lowerThresholdPos)
+    private int symbolCounterToStop = 0;
+    private float lowerThresholdPos = -400;
+
+    private Action<int, bool > onSymbolReachesThreshold;
+    private Action<bool> onBlurSet;
+
+    public bool IsSpinning { get; private set; } = false;
+
+    public SpinHandler(SpinnerManager spinnerManager, List<SlotSymbolData> slotSymbols, Action<int, bool> onSymbolReachesThreshold, Action<bool> onBlurSet, float lowerThresholdPos)
     {
-        this.spinnerManager = spinnerManager;
         this.slotSymbols = slotSymbols;
-        this.onSymbolReachesThreshold = onSymbolReachesThreshold;
+        this.spinnerManager = spinnerManager;
         this.lowerThresholdPos = lowerThresholdPos;
+
+        this.onSymbolReachesThreshold = onSymbolReachesThreshold;
+        this.onBlurSet = onBlurSet;
+
     }
 
-    public void StartSpinning()
+    public void StartSpinning(List<SlotSymbolTypes> selectedSymbols)
     {
         if (IsSpinning == true) return;
 
         IsSpinning = true;
-        spinnerManager.Reset();
+        spinnerManager.Reset(selectedSymbols);
         symbolCounterToStop = spinnerManager.GetScrollCountToStop();
         symbolCounterToStop -= Mathf.Abs(slotSymbols.Count - 2);//-2 for bottom + mid symbol 
+
+        onBlurSet?.Invoke(true);
     }
     public bool UpdateSpinner(float deltaTime)
     {
@@ -60,8 +70,11 @@ public class SpinHandler
                 if (newPos.y < lowerThresholdPos)
                 {
                     symbolCounterToStop--;
-
                     onSymbolReachesThreshold?.Invoke(i, symbolCounterToStop == 0);
+                    if(symbolCounterToStop == 0)
+                    {
+                        onBlurSet.Invoke(false);
+                    }
                 }
             }
         }

@@ -2,35 +2,51 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class SpinnerManager 
 {
-    private List<SpinnerSO> spinners;
+    private List<SpinnerConditionData> spinnersWithCondition;
     private int index = 0;
     private int scrollCount = 0;
     private float imageVerticalSize = 0;
-    public SpinnerManager(float imageVerticalSize)
+    private int totalColumns = 0;
+    private int myColumnIndex = 0;
+    private int spinnerIndexLimit = 0;
+    public SpinnerManager(float imageVerticalSize, int totalColumns, int myColumnIndex)
     {
-        spinners = new List<SpinnerSO>();
+        spinnersWithCondition = new List<SpinnerConditionData>();
         this.imageVerticalSize = imageVerticalSize;
-    }
-    public void AddSpinner(SpinnerSO spinner)
-    {
-        spinners.Add(spinner);
+        this.totalColumns = totalColumns;
+        this.myColumnIndex = myColumnIndex;
     }
 
-    public void AddSpinner(List<SpinnerSO> spinner)
+    public void AddSpinnerData(SpinnerConditionData spinnerData)
     {
-        spinners.AddRange(spinner);
+        spinnersWithCondition.Add(new SpinnerConditionData(spinnerData));
     }
 
-    public void Reset()
+    public void AddSpinner(List<SpinnerConditionData> spinnersData)
     {
+        spinnersWithCondition = spinnersData.ConvertAll<SpinnerConditionData>(spinnerData => new SpinnerConditionData(spinnerData));
+    }
+
+    public void Reset(List<SlotSymbolTypes> selectedSymbols)
+    {
+        spinnerIndexLimit = 0;
         index = 0;
         scrollCount = 0;
-        for (int i = 0; i < spinners.Count; i++)
+        for (int i = 0; i < spinnersWithCondition.Count; i++)
         {
-            spinners[i].ResetPositionHandler(imageVerticalSize);
-            scrollCount += spinners[i].GetScrollCount();
+            if (spinnersWithCondition[i] != null)
+            {
+                SpinnerSO spinner = spinnersWithCondition[i].SelectSpinnerBasedOnCondition(totalColumns, myColumnIndex, selectedSymbols);
+                if (spinner)
+                {
+                    spinnerIndexLimit++;
+                    spinner.ResetPositionHandler(imageVerticalSize);
+                    scrollCount += spinner.GetScrollCount();
+                }
+            }
         }
 
     }
@@ -41,13 +57,18 @@ public class SpinnerManager
     }
     public float Spin(float deltaTime)
     {
-        if (IsSpinningEnded()) return 0;
+        if (IsSpinningEnded() || spinnersWithCondition[index] == null) return 0;
 
-        float offset = spinners[index].UpdatePosition(deltaTime);
-
-        if (spinners[index].IsTimeUp())
+        SpinnerSO spinner = spinnersWithCondition[index].GetSelectedSpinner();
+        float offset = 0;
+        if (spinner)
         {
-            index++;
+            offset = spinner.UpdatePosition(deltaTime);
+
+            if (spinner.IsTimeUp())
+            {
+                index++;
+            }
         }
 
         return offset;
@@ -56,7 +77,7 @@ public class SpinnerManager
 
     public bool IsSpinningEnded()
     {
-        return index >= spinners.Count;
+        return index >= spinnerIndexLimit;
     }
 
 }

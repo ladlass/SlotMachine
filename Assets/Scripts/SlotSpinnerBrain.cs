@@ -7,6 +7,7 @@ public class SlotSpinnerBrain : MonoBehaviour
     [SerializeField]private List<ColumnSpinnerHelper> columnData;
 
     [SerializeField]private SymbolPrefabsSO prefabsList;
+    [SerializeField]private SlotSequencesSO slotSequence;
     [SerializeField]private Transform garbage;
 
     [SerializeField] [Range(0, 0.8f)]private float eachColumnSpinStartDelayDurationMin;
@@ -17,18 +18,38 @@ public class SlotSpinnerBrain : MonoBehaviour
     private SlotSymbolPool symbolPool;
     private bool enableSpinning = false;
 
+    private SlotRandomManager slotRandManager;
+    private SaveActions saveActions;
     private void Awake()
     {
-        symbolPool = new SlotSymbolPool(prefabsList.CreateDictionary(), garbage);
+        symbolPool = new SlotSymbolPool(prefabsList.CreateDictionary(), garbage, prefabsList.prefabClass);
         PrepareDependencies();
         AwakenSpinners();
+
+        saveActions = new SaveActions();
+        SaveData savedData = saveActions.LoadGame();
+
+        if (savedData != null)
+        {
+            slotRandManager = new SlotRandomManager(slotSequence.sequences, savedData.randomSeqData, savedData.currentRandomSeqIndex);
+        }
+        else
+        {
+            slotRandManager = new SlotRandomManager(slotSequence.sequences);
+        }
     }
 
     private IEnumerator Start()
     {
         yield return new WaitForSeconds(0.2f);
         enableSpinning = true;
+        //for (int i = 0; i < 102; i++)
+        //{
+        //    RandomSequenceData dat = slotRandManager.PullRandomSequence();
+        //    Debug.Log(string.Format("Index {0}, seq index{1}", dat.randomSeqIndex, dat.sequenceIndex));
+        //}
     }
+
     private void PrepareDependencies()
     {
         for (int i = 0; i < columnData.Count; i++)
@@ -37,12 +58,9 @@ public class SlotSpinnerBrain : MonoBehaviour
             {
                 columnData[i].column.SetPool(symbolPool);
 
-                SpinnerManager spinnerManager = new SpinnerManager(imageVerticalSize);
+                SpinnerManager spinnerManager = new SpinnerManager(imageVerticalSize, columnData.Count, i);
 
-                for (int j = 0; j < columnData[i].spinner.Count; j++)
-                {
-                    spinnerManager.AddSpinner(Instantiate(columnData[i].spinner[j]));
-                }
+                spinnerManager.AddSpinner(columnData[i].spinnersWithCondition);
                 columnData[i].column.SetSpinnerManager(spinnerManager);
             }
         }
@@ -85,6 +103,7 @@ public class SlotSpinnerBrain : MonoBehaviour
     {
         if (enableSpinning == false) return;
 
+        //Do not enable spinning until the previous spin stops
         for (int i = 0; i < columnData.Count; i++)
         {
             if (columnData[i].column.IsSpinning == true)
@@ -97,12 +116,16 @@ public class SlotSpinnerBrain : MonoBehaviour
 
     IEnumerator DelayedStart()
     {
-        for (int i = 0; i < columnData.Count; i++)
+        List<SlotSymbolTypes> randomSeq = slotRandManager.PullRandomSequence();
+
+        if (randomSeq.Count != columnData.Count) yield break;
+
+        for (int i = 0; i < columnData.Count && i < randomSeq.Count; i++)
         {
             if (columnData[i].column)
             {
                 float delay = Random.Range(eachColumnSpinStartDelayDurationMin, eachColumnSpinStartDelayDurationMax);
-                columnData[i].column.StartSpinning();
+                columnData[i].column.StartSpinning(randomSeq[i], randomSeq);
 
                 yield return new WaitForSeconds(delay);
             }
@@ -115,5 +138,84 @@ public class SlotSpinnerBrain : MonoBehaviour
 public class ColumnSpinnerHelper
 {
     public SlotColumn column;
-    public List<SpinnerSO> spinner;
+    public List<SpinnerConditionData> spinnersWithCondition;
+}
+
+[System.Serializable]
+public class SpinnerConditionData
+{
+    private bool isSelectionMade = false;
+    private bool isConditionTrue = false;
+   
+
+    public ConditionPrevSymbolsEqualSO condition;
+    public SpinnerSO spinnerOnTrue;
+    public SpinnerSO spinnerOnFalse;
+
+    public SpinnerConditionData(SpinnerConditionData clone)
+    {
+        if (clone == null) return;
+
+        if (clone.condition)
+        {
+            condition = ScriptableObject.Instantiate(clone.condition);
+        }
+        if (clone.spinnerOnTrue)
+        {
+            spinnerOnTrue = ScriptableObject.Instantiate(clone.spinnerOnTrue);
+        }
+        if (clone.spinnerOnFalse)
+        {
+            spinnerOnFalse = ScriptableObject.Instantiate(clone.spinnerOnFalse);
+        }
+    }
+
+    public void ResetSelection()
+    {
+        isSelectionMade = false;
+    }
+
+    public SpinnerSO SelectSpinnerBasedOnCondition(int columnCount, int myColumnIndex, List<SlotSymbolTypes> symbols)
+    {
+        isSelectionMade = true;
+
+        if (condition == null)
+        {
+            isConditionTrue = true;
+            return spinnerOnTrue;
+        }
+        else
+        {
+            if(condition.IsConditionMet(columnCount, myColumnIndex, symbols))
+            {
+                isConditionTrue = true;
+
+                return spinnerOnTrue;
+            }
+            else
+            {
+                isConditionTrue = false;
+
+                return spinnerOnFalse;
+            }
+        }
+    }
+
+    public SpinnerSO GetSelectedSpinner()
+    {
+        if (isSelectionMade)
+        {
+            if (isConditionTrue)
+            {
+                return spinnerOnTrue;
+            }
+            else
+            {
+                return spinnerOnFalse;
+            }
+        }
+
+        return null;
+    }
+
 }

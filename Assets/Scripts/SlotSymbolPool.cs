@@ -6,13 +6,15 @@ using UnityEngine;
 public class SlotSymbolPool
 {
     [SerializeField]private List<SlotSymbolData> slotItemsPool;
-    private Dictionary<SlotSymbolTypes, GameObject> symbolPrefabs;
+    private Dictionary<SlotSymbolTypes, SymbolPrefabData> symbolPrefabsData;
+    private SlotSymbolGameObj prefab;
     private Transform garbage;
-    public SlotSymbolPool(Dictionary<SlotSymbolTypes, GameObject> symbolPrefabs, Transform garbage)
+    public SlotSymbolPool(Dictionary<SlotSymbolTypes, SymbolPrefabData> symbolPrefabsData, Transform garbage, SlotSymbolGameObj prefab)
     {
         slotItemsPool = new List<SlotSymbolData>();
-        this.symbolPrefabs = symbolPrefabs;
+        this.symbolPrefabsData = symbolPrefabsData;
         this.garbage = garbage;
+        this.prefab = prefab;
     }
 
     public void Add(SlotSymbolData newData)
@@ -46,20 +48,27 @@ public class SlotSymbolPool
 
     private SlotSymbolData CreateSymbol(SlotSymbolTypes type, Transform parent)
     {
+        if (prefab == null) return null;
 
-        GameObject clone = GameObject.Instantiate(GetPrefabByType(type), parent);
+        GameObject clone = GameObject.Instantiate(prefab.gameObject, parent);
+        SlotSymbolGameObj newSymbol = clone.GetComponent<SlotSymbolGameObj>();
 
+        if (newSymbol == null) return null;
+
+        newSymbol.SetPrefabData(GetPrefabDataByType(type));
         SlotSymbolData newSymbolData = new SlotSymbolData();
         newSymbolData.rect = clone.GetComponent<RectTransform>();
+        newSymbolData.slotGameObj = newSymbol;
+        newSymbolData.symbolType = type;
 
         return newSymbolData;
     }
 
-    private GameObject GetPrefabByType(SlotSymbolTypes type)
+    private SymbolPrefabData GetPrefabDataByType(SlotSymbolTypes type)
     {
-        if (symbolPrefabs.ContainsKey(type))
+        if (symbolPrefabsData.ContainsKey(type))
         {
-            return symbolPrefabs[type];
+            return symbolPrefabsData[type];
         }
 
         return null;
@@ -76,29 +85,23 @@ public class SlotSymbolPool
             if(slotItemsPool[i] != null && slotItemsPool[i].symbolType == type)
             {
                 symbolToReturn = slotItemsPool[i];
-                if (symbolToReturn.rect)
-                {
-                    symbolToReturn.rect.gameObject.SetActive(true);
-                }
                 slotItemsPool.RemoveAt(i);
                 break;
             }
         }
 
+        if (symbolToReturn != null)
+        {
+            if (symbolToReturn.rect)
+            {
+                symbolToReturn.rect.gameObject.SetActive(true);
+            }
+            if (symbolToReturn.slotGameObj)
+            {
+                symbolToReturn.slotGameObj.SetPrefabData(GetPrefabDataByType(type));
+            }
+        }
+
         return symbolToReturn;
     }
-
-    //public SlotSymbolData PopIfExist(SlotSymbolTypes type)
-    //{
-    //    if (slotItemsPool != null && )
-    //    {
-    //        slotItemsPool.Add(newData);
-    //    }
-    //}
-
-    //private void CreateItem(bool enableSpawningSelected)
-    //{
-
-    //}
-
 }
