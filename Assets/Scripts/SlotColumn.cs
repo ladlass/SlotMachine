@@ -3,151 +3,154 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-[System.Serializable]
-public class SlotSymbolData
+namespace SlotMachine
 {
-    public RectTransform rect;
-    public SlotSymbolGameObj slotGameObj;
-    public SlotSymbolTypes symbolType;
-}
-public class SlotColumn : MonoBehaviour
-{
-    [SerializeField]private float lowerTrasholdPos = -400;
-    private float imageVerticalSize;
-
-    private List<SlotSymbolData> slotSymbols = new List<SlotSymbolData>();
-    private SlotSymbolPool symbolPool;
-    private SpinHandler    spinHandler;
-    private SpinnerManager spinnerManager;
-
-    private float yPositionOfTopSymbol;
-    private SlotSymbolTypes selectedSymbol;
-    private bool areSymbolsBlurry = false;
-
-    public bool IsSpinning { get; private set; } = false;
-
-    public void AwakeSpinner(float imageVerticalSize)
+    public class SlotColumn : MonoBehaviour
     {
-        this.imageVerticalSize = imageVerticalSize;
+        [SerializeField] private float lowerTrasholdPos = -400;
+        private float imageVerticalSize;
 
-        ResetPositionOfTopSymbol();
-        for (int i = 0; i < 3; i++)
+        private List<SlotSymbolData> slotSymbols = new List<SlotSymbolData>();
+        private SlotSymbolPool symbolPool;
+        private SpinHandler spinHandler;
+        private SpinnerManager spinnerManager;
+
+        private float yPositionOfTopSymbol;
+        private SlotSymbolTypes selectedSymbol;
+        private bool areSymbolsBlurry = false;
+
+        private Action onColumnStop;
+
+        public bool IsSpinning { get; private set; } = false;
+
+        public void AwakeSpinner(float imageVerticalSize)
         {
-            CreateRandomSymbol();
-        }
+            this.imageVerticalSize = imageVerticalSize;
 
-        spinHandler = new SpinHandler(spinnerManager, slotSymbols, OnSymbolOutOfBounds, SetSymbolBlur, lowerTrasholdPos);
-    }
-
-    public void SetPool(SlotSymbolPool symbolPool)
-    {
-        this.symbolPool = symbolPool;
-    }
-
-    public void SetSpinnerManager(SpinnerManager spinnerManager)
-    {
-        this.spinnerManager = spinnerManager;
-    }
-
-    private void SetSymbolBlur(bool isBlurry)
-    {
-        areSymbolsBlurry = isBlurry;
-        for (int i = 0; i < slotSymbols.Count; i++)
-        {
-            if (slotSymbols[i] != null && slotSymbols[i].slotGameObj != null)
+            ResetPositionOfTopSymbol();
+            for (int i = 0; i < 3; i++)
             {
-                slotSymbols[i].slotGameObj.SetBlur(isBlurry);
-            }
-        }
-    }
-
-    private void ResetPositionOfTopSymbol()
-    {
-        yPositionOfTopSymbol = imageVerticalSize *(slotSymbols.Count - 2);//2 for bottom and mid image
-    }
-
-    public void StartSpinning(SlotSymbolTypes selectedSymbol, List<SlotSymbolTypes> selectedSymbols)
-    {
-        if (IsSpinning == true) return;
-
-        this.selectedSymbol = selectedSymbol;
-        ResetPositionOfTopSymbol();
-
-        spinHandler.StartSpinning(selectedSymbols);
-        IsSpinning = true;
-    }
-
-    private void CreateSelectedSymbol()
-    {
-        SlotSymbolData slotData = null;
-        slotData = symbolPool.AcquireSymbol(selectedSymbol, transform);
-
-        if (slotData != null)
-        {
-            if (slotData.slotGameObj)
-            {
-                slotData.slotGameObj.SetBlur(areSymbolsBlurry);
-            }
-            SetSymbolPositionToTop(slotData);
-            slotSymbols.Add(slotData);
-        }
-    }
-
-    private void CreateRandomSymbol()
-    {
-        SlotSymbolData slotData = null;
-        int enumCount = Enum.GetNames(typeof(SlotSymbolTypes)).Length;
-        int randomIndex = UnityEngine.Random.Range(0, enumCount);
-        slotData = symbolPool.AcquireSymbol((SlotSymbolTypes)randomIndex, transform);
-
-        if (slotData != null)
-        {
-            if (slotData.slotGameObj)
-            {
-                slotData.slotGameObj.SetBlur(areSymbolsBlurry);
+                CreateRandomSymbol();
             }
 
-            SetSymbolPositionToTop(slotData);
-            slotSymbols.Add(slotData);
+            spinHandler = new SpinHandler(spinnerManager, slotSymbols, OnSymbolOutOfBounds, SetSymbolBlur, lowerTrasholdPos);
         }
-    }
-    private void SetSymbolPositionToTop(SlotSymbolData slotData)
-    {
-        if (slotData == null || slotData.rect == null) return;
 
-        RectTransform rect = slotData.rect;
-
-        if (slotSymbols.Count - 1 >= 0 && slotSymbols[slotSymbols.Count - 1].rect)
+        public void SetPool(SlotSymbolPool symbolPool)
         {
-            yPositionOfTopSymbol = slotSymbols[slotSymbols.Count - 1].rect.anchoredPosition.y;
+            this.symbolPool = symbolPool;
         }
-        yPositionOfTopSymbol += imageVerticalSize;
 
-        rect.anchoredPosition = new Vector3(0, yPositionOfTopSymbol);
-    }
-
-    public void UpdateSpinner(float deltaTime)
-    {
-        if (IsSpinning == false && spinHandler == null) return;
-
-        IsSpinning = spinHandler.UpdateSpinner(deltaTime);
-    }
-
-    
-    private void OnSymbolOutOfBounds(int index, bool spawnSelectedSymbol)
-    {
-        SlotSymbolData itemData = slotSymbols[index];
-        slotSymbols.RemoveAt(index);
-        symbolPool.Add(itemData);
-
-        if (spawnSelectedSymbol)
+        public void SetSpinnerManager(SpinnerManager spinnerManager)
         {
-            CreateSelectedSymbol();
+            this.spinnerManager = spinnerManager;
         }
-        else
+
+        private void SetSymbolBlur(bool isBlurry)
         {
-            CreateRandomSymbol();
+            areSymbolsBlurry = isBlurry;
+            for (int i = 0; i < slotSymbols.Count; i++)
+            {
+                if (slotSymbols[i] != null && slotSymbols[i].slotGameObj != null)
+                {
+                    slotSymbols[i].slotGameObj.SetBlur(isBlurry);
+                }
+            }
+        }
+
+        private void ResetPositionOfTopSymbol()
+        {
+            yPositionOfTopSymbol = imageVerticalSize * (slotSymbols.Count - 2);//2 for bottom and mid image
+        }
+
+        public void StartSpinning(SlotSymbolTypes selectedSymbol, List<SlotSymbolTypes> selectedSymbols, Action onColumnStop)
+        {
+            if (IsSpinning == true) return;
+
+            this.onColumnStop = onColumnStop;
+            this.selectedSymbol = selectedSymbol;
+            ResetPositionOfTopSymbol();
+
+            spinHandler.StartSpinning(selectedSymbols);
+            IsSpinning = true;
+        }
+
+        private void CreateSelectedSymbol()
+        {
+            SlotSymbolData slotData = null;
+            slotData = symbolPool.AcquireSymbol(selectedSymbol, transform);
+
+            if (slotData != null)
+            {
+                if (slotData.slotGameObj)
+                {
+                    slotData.slotGameObj.SetBlur(areSymbolsBlurry);
+                }
+                SetSymbolPositionToTop(slotData);
+                slotSymbols.Add(slotData);
+            }
+        }
+
+        private void CreateRandomSymbol()
+        {
+            SlotSymbolData slotData = null;
+            int enumCount = Enum.GetNames(typeof(SlotSymbolTypes)).Length;
+            int randomIndex = UnityEngine.Random.Range(0, enumCount);
+            slotData = symbolPool.AcquireSymbol((SlotSymbolTypes)randomIndex, transform);
+
+            if (slotData != null)
+            {
+                if (slotData.slotGameObj)
+                {
+                    slotData.slotGameObj.SetBlur(areSymbolsBlurry);
+                }
+
+                SetSymbolPositionToTop(slotData);
+                slotSymbols.Add(slotData);
+            }
+        }
+        private void SetSymbolPositionToTop(SlotSymbolData slotData)
+        {
+            if (slotData == null || slotData.rect == null) return;
+
+            RectTransform rect = slotData.rect;
+
+            if (slotSymbols.Count - 1 >= 0 && slotSymbols[slotSymbols.Count - 1].rect)
+            {
+                yPositionOfTopSymbol = slotSymbols[slotSymbols.Count - 1].rect.anchoredPosition.y;
+            }
+            yPositionOfTopSymbol += imageVerticalSize;
+
+            rect.anchoredPosition = new Vector3(0, yPositionOfTopSymbol);
+        }
+
+        public void UpdateSpinner(float deltaTime)
+        {
+            if (IsSpinning == false || spinHandler == null) return;
+
+            IsSpinning = spinHandler.UpdateSpinner(deltaTime);
+
+            if (IsSpinning == false)
+            {
+                onColumnStop?.Invoke();
+            }
+        }
+
+
+        private void OnSymbolOutOfBounds(int index, bool spawnSelectedSymbol)
+        {
+            SlotSymbolData itemData = slotSymbols[index];
+            slotSymbols.RemoveAt(index);
+            symbolPool.Add(itemData);
+
+            if (spawnSelectedSymbol)
+            {
+                CreateSelectedSymbol();
+            }
+            else
+            {
+                CreateRandomSymbol();
+            }
         }
     }
 }

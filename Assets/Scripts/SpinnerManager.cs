@@ -2,82 +2,76 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class SpinnerManager 
+namespace SlotMachine
 {
-    private List<SpinnerConditionData> spinnersWithCondition;
-    private int index = 0;
-    private int scrollCount = 0;
-    private float imageVerticalSize = 0;
-    private int totalColumns = 0;
-    private int myColumnIndex = 0;
-    private int spinnerIndexLimit = 0;
-    public SpinnerManager(float imageVerticalSize, int totalColumns, int myColumnIndex)
+    [System.Serializable]
+    public class SpinnerManager
     {
-        spinnersWithCondition = new List<SpinnerConditionData>();
-        this.imageVerticalSize = imageVerticalSize;
-        this.totalColumns = totalColumns;
-        this.myColumnIndex = myColumnIndex;
-    }
-
-    public void AddSpinnerData(SpinnerConditionData spinnerData)
-    {
-        spinnersWithCondition.Add(new SpinnerConditionData(spinnerData));
-    }
-
-    public void AddSpinner(List<SpinnerConditionData> spinnersData)
-    {
-        spinnersWithCondition = spinnersData.ConvertAll<SpinnerConditionData>(spinnerData => new SpinnerConditionData(spinnerData));
-    }
-
-    public void Reset(List<SlotSymbolTypes> selectedSymbols)
-    {
-        spinnerIndexLimit = 0;
-        index = 0;
-        scrollCount = 0;
-        for (int i = 0; i < spinnersWithCondition.Count; i++)
+        private List<SpinnerConditionHelper> spinnersWithCondition;
+        private int index = 0;
+        private int scrollCount = 0;
+        private float imageVerticalSize = 0;
+        private int totalColumns = 0;
+        private int myColumnIndex = 0;
+        private int spinnerIndexLimit = 0;
+        public SpinnerManager(float imageVerticalSize, int totalColumns, int myColumnIndex, List<SpinnerConditionHelper> spinnersData)
         {
-            if (spinnersWithCondition[i] != null)
+            spinnersWithCondition = new List<SpinnerConditionHelper>();
+            this.imageVerticalSize = imageVerticalSize;
+            this.totalColumns = totalColumns;
+            this.myColumnIndex = myColumnIndex;
+            this.spinnersWithCondition = spinnersData.ConvertAll(spinnerData => new SpinnerConditionHelper(spinnerData));
+        }
+
+        public void Reset(List<SlotSymbolTypes> selectedSymbols)
+        {
+            spinnerIndexLimit = 0;
+            index = 0;
+            scrollCount = 0;
+            for (int i = 0; i < spinnersWithCondition.Count; i++)
             {
-                SpinnerSO spinner = spinnersWithCondition[i].SelectSpinnerBasedOnCondition(totalColumns, myColumnIndex, selectedSymbols);
-                if (spinner)
+                if (spinnersWithCondition[i] != null)
                 {
-                    spinnerIndexLimit++;
-                    spinner.ResetPositionHandler(imageVerticalSize);
-                    scrollCount += spinner.GetScrollCount();
+                    SpinnerSO spinner = spinnersWithCondition[i].SelectSpinnerBasedOnCondition(totalColumns, myColumnIndex, selectedSymbols);
+                    if (spinner)
+                    {
+                        spinnerIndexLimit++;
+                        spinner.ResetPositionHandler(imageVerticalSize);
+                        scrollCount += spinner.GetScrollCount();
+                    }
                 }
             }
+
         }
 
-    }
-
-    public int GetScrollCountToStop()
-    {
-        return scrollCount;
-    }
-    public float Spin(float deltaTime)
-    {
-        if (IsSpinningEnded() || spinnersWithCondition[index] == null) return 0;
-
-        SpinnerSO spinner = spinnersWithCondition[index].GetSelectedSpinner();
-        float offset = 0;
-        if (spinner)
+        public int GetScrollCountToStop()
         {
-            offset = spinner.UpdatePosition(deltaTime);
+            return scrollCount;
+        }
+        public float Spin(float deltaTime)
+        {
+            if (IsSpinningEnded() || spinnersWithCondition[index] == null) return 0;
 
-            if (spinner.IsTimeUp())
+            SpinnerSO spinner = spinnersWithCondition[index].GetSelectedSpinner();
+            float offset = 0;
+            if (spinner)
             {
-                index++;
+                offset = spinner.UpdatePosition(deltaTime);
+
+                if (spinner.IsTimeUp())
+                {
+                    index++;
+                }
             }
+
+            return offset;
         }
 
-        return offset;
+
+        public bool IsSpinningEnded()
+        {
+            return index >= spinnerIndexLimit;
+        }
+
     }
-
-
-    public bool IsSpinningEnded()
-    {
-        return index >= spinnerIndexLimit;
-    }
-
 }

@@ -4,35 +4,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
-[RequireComponent(typeof(RectTransform))]
-public class SlotSymbolGameObj : MonoBehaviour
+namespace SlotMachine
 {
-    private Image imageComp;
-    private SymbolPrefabData data;
-    void Awake()
+    [RequireComponent(typeof(Image))]
+    [RequireComponent(typeof(RectTransform))]
+    public class SlotSymbolGameObj : MonoBehaviour
     {
-        imageComp = GetComponent<Image>();
-    }
-
-    public void SetPrefabData(SymbolPrefabData data)
-    {
-        this.data = data;
-
-        SetBlur(false);
-    }
-
-    public void SetBlur(bool isBlurry)
-    {
-        if (data != null)
+        private Image imageComp;
+        private SymbolPrefabData data;
+        void Awake()
         {
-            if (isBlurry)
+            imageComp = GetComponent<Image>();
+        }
+
+        public void SetPrefabData(SymbolPrefabData data)
+        {
+            this.data = data;
+
+            SetBlur(false);
+        }
+
+        public void SetBlur(bool isBlurry)
+        {
+            if (data != null)
             {
-                imageComp.sprite = data.blurryImage;
-            }
-            else
-            {
-                imageComp.sprite = data.normalImage;
+                if (isBlurry)
+                {
+                    imageComp.sprite = data.blurryImage;
+                }
+                else
+                {
+                    imageComp.sprite = data.normalImage;
+                }
             }
         }
     }

@@ -15,21 +15,41 @@ MonoBehaviour:
   sequences:
   - percentage: 13
     symbols: 020000000000000003000000
+    spawnFxOnFinish: 0
+    fxAmountMultiplier: 0
   - percentage: 13
     symbols: 000000000400000002000000
+    spawnFxOnFinish: 0
+    fxAmountMultiplier: 0
   - percentage: 13
     symbols: 040000000400000001000000
+    spawnFxOnFinish: 0
+    fxAmountMultiplier: 0
   - percentage: 13
     symbols: 040000000200000000000000
+    spawnFxOnFinish: 0
+    fxAmountMultiplier: 0
   - percentage: 13
     symbols: 030000000300000000000000
+    spawnFxOnFinish: 0
+    fxAmountMultiplier: 0
   - percentage: 9
     symbols: 000000000000000000000000
+    spawnFxOnFinish: 1
+    fxAmountMultiplier: 1
   - percentage: 8
     symbols: 020000000200000002000000
+    spawnFxOnFinish: 1
+    fxAmountMultiplier: 2
   - percentage: 7
     symbols: 010000000100000001000000
+    spawnFxOnFinish: 1
+    fxAmountMultiplier: 3
   - percentage: 6
     symbols: 040000000400000004000000
+    spawnFxOnFinish: 1
+    fxAmountMultiplier: 4
   - percentage: 5
     symbols: 030000000300000003000000
+    spawnFxOnFinish: 1
+    fxAmountMultiplier: 5
