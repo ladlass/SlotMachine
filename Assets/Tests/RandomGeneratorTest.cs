@@ -56,4 +56,117 @@ public class RandomGeneratorTest
         }
         Debug.Log("--------------------");
     }
+
+
+    [Test]
+    public void TestSpinnerManagerSpinTimer()
+    {
+        SpinnerSO spinner = (SpinnerSO)(ScriptableObject.CreateInstance(nameof(SpinnerSO)));
+        spinner.duration = 1;
+        spinner.speedMult = 5;
+        spinner.easeType = EaseTypes.Lineer;
+
+        SpinnerConditionHelper condHelper = new SpinnerConditionHelper();
+        condHelper.condition = null;
+        condHelper.spinnerOnTrue = spinner;
+
+        List<SpinnerConditionHelper> spinnerConditionHelper = new List<SpinnerConditionHelper>();
+        spinnerConditionHelper.Add(condHelper);
+
+        SpinnerManager spinnerManager = new SpinnerManager(200, 3, 2, spinnerConditionHelper);
+        spinnerManager.Reset(null);
+
+
+        spinnerManager.Spin(0.99f);
+
+
+        Assert.IsFalse(spinnerManager.IsSpinningEnded());
+
+        spinnerManager.Spin(0.01f);
+
+        Assert.IsTrue(spinnerManager.IsSpinningEnded());
+    }
+
+
+    [Test]
+    public void TestSpinnerTimer()
+    {
+        SpinnerSO spinner = (SpinnerSO)(ScriptableObject.CreateInstance(nameof(SpinnerSO)));
+        spinner.duration = 1;
+        spinner.speedMult = 5;
+        spinner.easeType = EaseTypes.Lineer;
+
+        spinner.UpdatePosition(0.99f);
+
+        Assert.IsFalse(spinner.IsTimeUp());
+
+        spinner.UpdatePosition(0.01f);
+
+        Assert.IsTrue(spinner.IsTimeUp());
+    }
+
+    [Test]
+    public void TestSpinHandlerEventsAndTimer()
+    {
+        SpinnerSO spinner = (SpinnerSO)(ScriptableObject.CreateInstance(nameof(SpinnerSO)));
+        spinner.duration = 1;
+        spinner.speedMult = 5;
+        spinner.easeType = EaseTypes.Lineer;
+
+        SpinnerConditionHelper condHelper = new SpinnerConditionHelper();
+        condHelper.condition = null;
+        condHelper.spinnerOnTrue = spinner;
+
+        List<SpinnerConditionHelper> spinnerConditionHelper = new List<SpinnerConditionHelper>();
+        spinnerConditionHelper.Add(condHelper);
+
+        const float verticalSizeOfImage = 200;
+        SpinnerManager spinnerManager = new SpinnerManager(verticalSizeOfImage, 3, 2, spinnerConditionHelper);
+
+        List<SlotSymbolData> slotSymbols = new List<SlotSymbolData>();
+
+        float topPoint = -verticalSizeOfImage;
+        for (int i = 0; i < 3; i++)
+        {
+            SlotSymbolData newSymbol = new SlotSymbolData();
+            GameObject newObj = new GameObject();
+            SlotSymbolGameObj slotGameObj = newObj.AddComponent<SlotSymbolGameObj>();
+            newSymbol.rect = newObj.GetComponent<RectTransform>();
+            newSymbol.slotGameObj = slotGameObj;
+            newSymbol.rect.anchoredPosition = new Vector2(0, topPoint);
+            topPoint += verticalSizeOfImage;
+            slotSymbols.Add(newSymbol);
+        }
+        
+
+        bool didOnThresholdCalled = false;
+        bool didOnBlurCalled = false;
+
+        SpinHandler spinHandler = new SpinHandler(spinnerManager, slotSymbols, 
+        (int index, bool b) => 
+        {
+            int topIndex = index - 1 >= 0 ? index - 1: slotSymbols.Count - 1;
+            slotSymbols[index].rect.anchoredPosition = new Vector2(0, slotSymbols[topIndex].rect.anchoredPosition.y);
+            didOnThresholdCalled = true; 
+        }, 
+        (bool b) => 
+        { 
+            didOnBlurCalled = true; 
+        }, -400);
+
+        spinHandler.StartSpinning(null);
+
+        for (float i = 0f; i < 0.9f; i+= Time.deltaTime)
+        {
+            spinHandler.UpdateSpinner(Time.deltaTime);
+        }
+
+        Assert.IsTrue(spinHandler.IsSpinning);
+
+        spinHandler.UpdateSpinner(0.1f);
+
+        Assert.IsFalse(spinHandler.IsSpinning);
+        Assert.IsTrue(didOnThresholdCalled);
+        Assert.IsTrue(didOnBlurCalled);
+    }
 }

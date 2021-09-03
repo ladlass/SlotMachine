@@ -49,7 +49,6 @@ namespace SlotMachine
             if (spinnerManager.IsSpinningEnded())
             {
                 IsSpinning = false;
-                //OnSpinStop
             }
 
             SpinColumn(posOffsetY);
@@ -68,14 +67,13 @@ namespace SlotMachine
                 {
                     newPos.y = rect.anchoredPosition.y + movementAmount;
                     rect.anchoredPosition = newPos;
-
                     if (newPos.y < lowerThresholdPos)
                     {
                         symbolCounterToStop--;
                         onSymbolReachesThreshold?.Invoke(i, symbolCounterToStop == 0);
                         if (symbolCounterToStop == 0)
                         {
-                            onBlurSet.Invoke(false);
+                            onBlurSet?.Invoke(false);
                         }
                     }
                 }

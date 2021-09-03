@@ -11,8 +11,8 @@ namespace SlotMachine
         private float imageVerticalSize;
 
         private List<SlotSymbolData> slotSymbols = new List<SlotSymbolData>();
-        private SlotSymbolPool symbolPool;
         private SpinHandler spinHandler;
+        private SlotSymbolPool symbolPool;
         private SpinnerManager spinnerManager;
 
         private float yPositionOfTopSymbol;

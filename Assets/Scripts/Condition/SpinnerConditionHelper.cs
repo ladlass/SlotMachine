@@ -14,6 +14,10 @@ namespace SlotMachine
         public SpinnerSO spinnerOnTrue;
         public SpinnerSO spinnerOnFalse;
 
+        public SpinnerConditionHelper()
+        {
+
+        }
         public SpinnerConditionHelper(SpinnerConditionHelper clone)
         {
             if (clone == null) return;

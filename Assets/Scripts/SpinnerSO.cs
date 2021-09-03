@@ -5,10 +5,10 @@ namespace SlotMachine
     [CreateAssetMenu(fileName = "SpeedHandler", menuName = "ScriptableObjects/SpinHandler", order = 2)]
     public class SpinnerSO : ScriptableObject
     {
-        [SerializeField] private float duration = 4;
-        [SerializeField] private float speedMult = 5;
+        public float duration = 4;
+        public float speedMult = 5;
         //[SerializeField] private float endSpeedMult = 5;
-        [SerializeField] private EaseTypes easeType;
+        public EaseTypes easeType;
         //private float currentSpeedMult = 0;
         //private float imageVerticalSize = 260;
         private float timer = 0;
@@ -72,6 +72,7 @@ namespace SlotMachine
         {
             return timer >= duration;
         }
+
         public float UpdatePosition(float deltaTime)
         {
             if (duration == 0.0f) return 0;

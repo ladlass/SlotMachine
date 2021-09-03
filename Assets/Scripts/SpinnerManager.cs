@@ -10,10 +10,10 @@ namespace SlotMachine
         private List<SpinnerConditionHelper> spinnersWithCondition;
         private int index = 0;
         private int scrollCount = 0;
-        private float imageVerticalSize = 0;
         private int totalColumns = 0;
         private int myColumnIndex = 0;
         private int spinnerIndexLimit = 0;
+        private float imageVerticalSize = 0;
         public SpinnerManager(float imageVerticalSize, int totalColumns, int myColumnIndex, List<SpinnerConditionHelper> spinnersData)
         {
             spinnersWithCondition = new List<SpinnerConditionHelper>();
@@ -51,7 +51,6 @@ namespace SlotMachine
         public float Spin(float deltaTime)
         {
             if (IsSpinningEnded() || spinnersWithCondition[index] == null) return 0;
-
             SpinnerSO spinner = spinnersWithCondition[index].GetSelectedSpinner();
             float offset = 0;
             if (spinner)
