@@ -7,16 +7,25 @@ namespace SlotMachine
 {
     public class SlotFxComponent : MonoBehaviour
     {
-        [SerializeField] private GameObject fxPrefab;
+        [SerializeField] private ParticleSystem fxPrefab;
         [SerializeField] private float fxDuration = 3;
         [SerializeField] private Transform fxParent;
+        private List<ParticleSystem> particlePool;
+        private WaitForSeconds secsToPool = new WaitForSeconds(4);
 
+        public void AwakeComponent()
+        {
+            particlePool = new List<ParticleSystem>();
+            
+            ParticleSystem particle = Instantiate(fxPrefab, fxParent);
+            particle.gameObject.SetActive(false);
+            particlePool.Add(particle);
+        }
         public void SpawnCoinFx(int amountMultiplier)
         {
             if (fxPrefab == null || fxParent == null) return;
 
-            GameObject cloneFx = Instantiate(fxPrefab, fxParent);
-            ParticleSystem particle = cloneFx.GetComponent<ParticleSystem>();
+            ParticleSystem particle = CreateParticle();
             if (particle)
             {
                 EmissionModule emissionModule = particle.emission;
@@ -27,9 +36,33 @@ namespace SlotMachine
                     burst.count = amountMultiplier;
                     emissionModule.SetBurst(i, burst);
                 }
-
             }
-            Destroy(cloneFx, 10);
+        }
+
+        private IEnumerator PoolParticle(ParticleSystem particle)
+        {
+            yield return secsToPool;
+
+            particle.gameObject.SetActive(false);
+            particlePool.Add(particle);
+        }
+
+        private ParticleSystem CreateParticle()
+        {
+            if (particlePool == null) return null;
+
+            if(particlePool.Count > 0)
+            {
+                ParticleSystem newParticle = particlePool[0];
+                particlePool.RemoveAt(0);
+                newParticle.gameObject.SetActive(true);
+                StartCoroutine(PoolParticle(newParticle));
+                return newParticle;
+            }
+            ParticleSystem cloneParticle = Instantiate(fxPrefab, fxParent);
+            particlePool.Add(cloneParticle);
+
+            return cloneParticle;
         }
 
         public float GetDuration()

@@ -57,6 +57,93 @@ public class RandomGeneratorTest
         Debug.Log("--------------------");
     }
 
+    [Test]
+    public void Test100SequenceAndTheirIntervals()
+    {
+        List<SymbolSequenceProbabilityData> sequences = new List<SymbolSequenceProbabilityData>();
+        
+        //%13 
+        List<SlotSymbolTypes> symbols = new List<SlotSymbolTypes>();
+        symbols.Add(SlotSymbolTypes.Bonus);
+        symbols.Add(SlotSymbolTypes.A);
+        symbols.Add(SlotSymbolTypes.Jackpot);
+
+        SymbolSequenceProbabilityData newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 13;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 13;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 13;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 13;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 13;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        //%9
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 9;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+        //%8
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 8;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+        //%7
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 7;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+        //%6
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 6;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+        //%5
+        newSeq = new SymbolSequenceProbabilityData();
+        newSeq.percentage = 5;
+        newSeq.symbols = symbols;
+        sequences.Add(newSeq);
+
+        SlotRandomManager randomManager = new SlotRandomManager(sequences);
+
+        randomManager.Calculate100RandomSequence();
+        List<RandomSequenceData> randomSeqDat = randomManager.GetRandSeqData();
+
+        Debug.Log("----------100 Random Sequence----------");
+        List<string> intervalLog = new List<string>();
+        for (int i = 0; i < randomManager.GetSequencePreset().Count; i++)
+        {
+            intervalLog.Add(string.Format("Percentage: {0}, intervals = ", randomManager.GetSequencePreset()[i].percentage));
+        }
+
+        for (int i = 0; i < randomSeqDat.Count; i++)
+        {
+            intervalLog[randomSeqDat[i].sequenceIndex] += string.Format(" [[{0}, {1}] = {2}] ", randomSeqDat[i].floor, randomSeqDat[i].ceiling, i);
+            Assert.IsTrue(randomSeqDat[i].floor <= i && randomSeqDat[i].ceiling >= i);
+        }
+
+        for (int i = 0; i < intervalLog.Count; i++)
+        {
+            Debug.Log(intervalLog[i]);
+        }
+        Debug.Log("--------------------");
+    }
+
 
     [Test]
     public void TestSpinnerManagerSpinTimer()

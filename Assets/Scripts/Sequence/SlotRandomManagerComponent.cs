@@ -8,7 +8,6 @@ namespace SlotMachine
     {
         [SerializeField] private SlotSequencesSO slotSequence;
         private SlotRandomManager slotRandManager;
-
         public void AwakeComponent(SaveManagerComponent saveManager)
         {
             if (slotSequence == null)

@@ -17,10 +17,10 @@ namespace SlotMachine
 
         [SerializeField] private float imageVerticalSize = 260;
 
-        private SaveManagerComponent saveManagerComponent;
-        private SlotFxComponent slotFxComponent;
-        private SlotRandomManagerComponent slotRandomManagerComponent;
-        private SlotPoolComponent slotPoolComponent;
+        [SerializeField] private SaveManagerComponent saveManagerComponent;
+        [SerializeField] private SlotFxComponent slotFxComponent;
+        [SerializeField] private SlotRandomManagerComponent slotRandomManagerComponent;
+        [SerializeField] private SlotPoolComponent slotPoolComponent;
 
         private int stopppedColumnCount;
         private bool enableSpinning = false;
@@ -30,22 +30,13 @@ namespace SlotMachine
 
         private void Awake()
         {
-            GetComponents();
             AwakeComponents();
             InjectColumnDependencies();
             AwakenSpinners();
         }
-
-        private void GetComponents()
-        {
-            slotFxComponent = GetComponent<SlotFxComponent>();
-            slotPoolComponent = GetComponent<SlotPoolComponent>();
-            saveManagerComponent = GetComponent<SaveManagerComponent>();
-            slotRandomManagerComponent = GetComponent<SlotRandomManagerComponent>();
-        }
-
         private void AwakeComponents()
         {
+            slotFxComponent.AwakeComponent();
             slotPoolComponent.AwakeComponent();
             saveManagerComponent.AwakeComponent();
             slotRandomManagerComponent.AwakeComponent(saveManagerComponent);

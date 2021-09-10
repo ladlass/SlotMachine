@@ -28,21 +28,18 @@ namespace SlotMachine
         }
         public static float GetEaseByType(EaseTypes type, float start, float end, float value)
         {
-            if (type == EaseTypes.EaseOutCubic)
+            switch (type)
             {
-                return EaseOutCubic(start, end, value);
-            }
-            else if (type == EaseTypes.EaseInOutQuad)
-            {
-                return EaseInOutQuad(start, end, value);
-            }
-            else if (type == EaseTypes.EaseOutSine)
-            {
-                return EaseOutSine(start, end, value);
-            }
-            else
-            {
-                return Mathf.Lerp(start, end, value);
+                case EaseTypes.Lineer:
+                    return Mathf.Lerp(start, end, value);
+                case EaseTypes.EaseOutCubic:
+                    return EaseOutCubic(start, end, value);
+                case EaseTypes.EaseInOutQuad:
+                    return EaseInOutQuad(start, end, value);
+                case EaseTypes.EaseOutSine:
+                    return EaseOutSine(start, end, value);
+                default:
+                    return Mathf.Lerp(start, end, value);
             }
         }
     }

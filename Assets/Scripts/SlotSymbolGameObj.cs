@@ -10,12 +10,8 @@ namespace SlotMachine
     [RequireComponent(typeof(RectTransform))]
     public class SlotSymbolGameObj : MonoBehaviour
     {
-        private Image imageComp;
+        [SerializeField]private Image imageComp;
         private SymbolPrefabData data;
-        void Awake()
-        {
-            imageComp = GetComponent<Image>();
-        }
 
         public void SetPrefabData(SymbolPrefabData data)
         {
@@ -26,7 +22,7 @@ namespace SlotMachine
 
         public void SetBlur(bool isBlurry)
         {
-            if (data != null)
+            if (data != null && imageComp != null)
             {
                 if (isBlurry)
                 {

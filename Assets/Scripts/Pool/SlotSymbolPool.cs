@@ -52,14 +52,13 @@ namespace SlotMachine
         {
             if (prefab == null) return null;
 
-            GameObject clone = Object.Instantiate(prefab.gameObject, parent);
-            SlotSymbolGameObj newSymbol = clone.GetComponent<SlotSymbolGameObj>();
+            SlotSymbolGameObj newSymbol = GameObject.Instantiate(prefab, parent);
 
             if (newSymbol == null) return null;
 
             newSymbol.SetPrefabData(GetPrefabDataByType(type));
             SlotSymbolData newSymbolData = new SlotSymbolData();
-            newSymbolData.rect = clone.GetComponent<RectTransform>();
+            newSymbolData.rect = newSymbol.GetComponent<RectTransform>();
             newSymbolData.slotGameObj = newSymbol;
             newSymbolData.symbolType = type;
 
