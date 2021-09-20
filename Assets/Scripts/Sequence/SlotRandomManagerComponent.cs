@@ -12,8 +12,7 @@ namespace SlotMachine
         {
             if (slotSequence == null)
             {
-                new Exception("No Sequence Selected");
-                return;
+                throw new Exception("No Sequence Selected");
             }
 
             SaveData savedData = saveManager.LoadGame();

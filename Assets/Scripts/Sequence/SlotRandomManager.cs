@@ -12,7 +12,7 @@ namespace SlotMachine
         [SerializeField] private List<RandomSequenceData> randomSequenceSlots;
         private List<RandomSequenceData> emptySlots;
         private List<RandomSequenceData> remainingSequences;
-        private const int emptyNumber = -1;
+        private const int EmptyNumber = -1;
         private int currentRandomSeqIndex = 0;
         private Action onRandomSeqLimitReached;
 
@@ -80,7 +80,7 @@ namespace SlotMachine
             {
                 RandomSequenceData empty = new RandomSequenceData();
                 empty.randomSeqIndex = i;
-                empty.sequenceIndex = emptyNumber;
+                empty.sequenceIndex = EmptyNumber;
                 for (int j = 0; j < arrays.Length; j++)
                 {
                     if (arrays[j] != null)
@@ -114,7 +114,7 @@ namespace SlotMachine
             outlistToFill.Clear();
             for (int x = floor; x <= ceiling; x++)
             {
-                if (listToIterate[x].sequenceIndex == emptyNumber)
+                if (listToIterate[x].sequenceIndex == EmptyNumber)
                 {
                     outlistToFill.Add(x);
                 }
@@ -162,7 +162,6 @@ namespace SlotMachine
             AddEmptySlotData(100, randomSequenceSlots, emptySlots);
 
             sequencePresets.Sort();
-
 
             for (int j = 0; j < sequencePresets.Count; j++)
             {

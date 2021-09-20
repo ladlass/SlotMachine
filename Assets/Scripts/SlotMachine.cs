@@ -22,7 +22,7 @@ namespace SlotMachine
         [SerializeField] private SlotRandomManagerComponent slotRandomManagerComponent;
         [SerializeField] private SlotPoolComponent slotPoolComponent;
 
-        private int stopppedColumnCount;
+        private int stoppedColumnCount;
         private bool enableSpinning = false;
 
         private SymbolSequenceProbabilityData selectedSequence = null;
@@ -109,7 +109,7 @@ namespace SlotMachine
             if (selectedSequence == null) yield break;
             if (selectedSequence.symbols.Count != columnData.Count) yield break;
 
-            stopppedColumnCount = 0;
+            stoppedColumnCount = 0;
             enableSpinning = false;
             if (spinButton) spinButton.gameObject.SetActive(false);
 
@@ -129,8 +129,8 @@ namespace SlotMachine
         {
             if (columnData != null)
             {
-                stopppedColumnCount++;
-                if (columnData.Count == stopppedColumnCount)
+                stoppedColumnCount++;
+                if (columnData.Count == stoppedColumnCount)
                 {
                     OnSlotMachineStop();
                 }

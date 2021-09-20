@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SlotMachine
 {
@@ -21,14 +22,20 @@ namespace SlotMachine
 
         private Action onColumnStop;
 
+        [FormerlySerializedAs("halfColumnSymbolCapacity")] public int halfColumnSymbolCapacityWithoutCenter; 
         public bool IsSpinning { get; private set; } = false;
 
         public void AwakeSpinner(float imageVerticalSize)
         {
+            if(imageVerticalSize <= 0) return;
+            
             this.imageVerticalSize = imageVerticalSize;
-
+            
+            halfColumnSymbolCapacityWithoutCenter = (int)(Mathf.Abs(lowerTrasholdPos) - (imageVerticalSize / 2));//remove half the size of center symbol
+            halfColumnSymbolCapacityWithoutCenter = Mathf.CeilToInt(halfColumnSymbolCapacityWithoutCenter / imageVerticalSize);
+            
             ResetPositionOfTopSymbol();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2 * halfColumnSymbolCapacityWithoutCenter + 1; i++)//2 half + center symbol
             {
                 CreateRandomSymbol();
             }
@@ -60,7 +67,7 @@ namespace SlotMachine
 
         private void ResetPositionOfTopSymbol()
         {
-            yPositionOfTopSymbol = imageVerticalSize * (slotSymbols.Count - 2);//2 for bottom and mid image
+            yPositionOfTopSymbol = imageVerticalSize * (-halfColumnSymbolCapacityWithoutCenter - 1);//2 for bottom and mid image
         }
 
         public void StartSpinning(SlotSymbolTypes selectedSymbol, List<SlotSymbolTypes> selectedSymbols, Action onColumnStop)
@@ -69,16 +76,15 @@ namespace SlotMachine
 
             this.onColumnStop = onColumnStop;
             this.selectedSymbol = selectedSymbol;
-            ResetPositionOfTopSymbol();
 
             spinHandler.StartSpinning(selectedSymbols);
             IsSpinning = true;
         }
+        
 
         private void CreateSelectedSymbol()
         {
-            SlotSymbolData slotData = null;
-            slotData = symbolPool.AcquireSymbol(selectedSymbol, transform);
+            SlotSymbolData slotData = symbolPool.AcquireSymbol(selectedSymbol, transform);
 
             if (slotData != null)
             {
@@ -93,10 +99,9 @@ namespace SlotMachine
 
         private void CreateRandomSymbol()
         {
-            SlotSymbolData slotData = null;
             int enumCount = Enum.GetNames(typeof(SlotSymbolTypes)).Length;
             int randomIndex = UnityEngine.Random.Range(0, enumCount);
-            slotData = symbolPool.AcquireSymbol((SlotSymbolTypes)randomIndex, transform);
+            SlotSymbolData slotData = symbolPool.AcquireSymbol((SlotSymbolTypes)randomIndex, transform);
 
             if (slotData != null)
             {

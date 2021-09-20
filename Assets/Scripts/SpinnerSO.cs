@@ -72,6 +72,8 @@ namespace SlotMachine
         {
             return timer >= duration;
         }
+        
+        
 
         public float UpdatePosition(float deltaTime)
         {
